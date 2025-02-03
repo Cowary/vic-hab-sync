@@ -47,6 +47,28 @@ public class HabiticaService {
         return response.getBody().getData();
     }
 
+    public List<TaskRs> getCompletedTasksRs() {
+
+        String url = baseUrl + "/tasks/user?type=completedTodos";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("x-api-user", user);
+        headers.set("x-api-key", token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<TasksRs> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                requestEntity,
+                TasksRs.class
+        );
+        LOGGER.info("Completed a request to receive all tasks in habitica");
+        LOGGER.debug("Received tasks: {}", response.getBody());
+
+        return response.getBody().getData();
+    }
+
 
     public AddTaskRs addTask(TaskRq addTaskRequest) {
         String url = baseUrl + "/tasks/user";
@@ -65,5 +87,25 @@ public class HabiticaService {
         );
 
         return response.getBody();
+    }
+
+    public Boolean deleteTask(String taskId) {
+        String url = baseUrl + "/tasks/{taskID}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("x-api-user", user);
+        headers.set("x-api-key", token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<Object> response = restTemplate.exchange(
+                url,
+                HttpMethod.DELETE,
+                requestEntity,
+                Object.class,
+                taskId
+        );
+
+        return response.getStatusCode() == HttpStatus.OK;
     }
 }
